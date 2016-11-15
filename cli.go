@@ -26,13 +26,11 @@ func main() {
 		fmt.Printf("Username not defined\n")
 		os.Exit(1)
 	}
-	os.Setenv("NCU", *user)
 
 	if *pass == "" {
 		fmt.Printf("Password not defined\n")
 		os.Exit(1)
 	}
-	os.Setenv("NCP", *pass)
 
 	var (
 		err  error
