@@ -6,6 +6,8 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/phikal/neoc"
 )
 
 func main() {
@@ -35,7 +37,7 @@ func main() {
 	var (
 		err  error
 		size int
-		list []Item
+		list []neoc.Item
 	)
 
 	switch strings.ToLower(flag.Arg(0))[0] {
@@ -48,7 +50,7 @@ func main() {
 		if *verb {
 			fmt.Println("Uploading...")
 		}
-		err = Upload(flag.Args()[1:], *user, *pass)
+		err = neoc.Upload(flag.Args()[1:], *user, *pass)
 	case 'd': // delete
 		if flag.NArg() < 2 {
 			fmt.Printf("DELETE request requires arguments\n")
@@ -58,10 +60,10 @@ func main() {
 		if *verb {
 			fmt.Println("Deleting...")
 		}
-		err = Delete(flag.Args()[1:], *user, *pass)
+		err = neoc.Delete(flag.Args()[1:], *user, *pass)
 	case 's': // sync
 		ch := make(chan string)
-		size, err = Sync(flag.Arg(1), ch, *user, *pass)
+		size, err = neoc.Sync(flag.Arg(1), ch, *user, *pass)
 
 		if *verb {
 			fmt.Println("Downloading...")
@@ -84,7 +86,7 @@ func main() {
 		}
 	case 'p': // push
 		ch := make(chan string, 1<<5)
-		err = Push(flag.Arg(1), ch, *user, *pass)
+		err = neoc.Push(flag.Arg(1), ch, *user, *pass)
 
 		if *verb {
 			fmt.Println("Pushing...")
@@ -103,12 +105,12 @@ func main() {
 			}
 		}
 
-		Upload(flist, *user, *pass)
+		neoc.Upload(flist, *user, *pass)
 	case 'l': // list
 		if *verb {
 			fmt.Println("Loading...")
 		}
-		list, err = List(*user, *pass)
+		list, err = neoc.List(*user, *pass)
 
 		for _, itm := range list {
 			fmt.Printf("%10d %s %s\n", itm.Size, itm.Updated.Format(time.Stamp), itm.Path)
