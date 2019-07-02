@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-func Upload(files []string, user, pass string) error {
+func (c *Client) Upload(files []string) error {
 	var buf bytes.Buffer
 	wr := multipart.NewWriter(&buf)
 	for _, file := range files {
@@ -43,13 +43,13 @@ func Upload(files []string, user, pass string) error {
 	}
 	wr.Close()
 
-	req, err := http.NewRequest(http.MethodPost, upload, &buf)
+	req, err := http.NewRequest(http.MethodPost, c.api+"/upload", &buf)
 	if err != nil {
 		return err
 	}
 
-	req.SetBasicAuth(user, pass)
-	req.Header.Set("User-Agent", ua)
+	req.SetBasicAuth(c.user, c.pass)
+	req.Header.Set("User-Agent", userAgent)
 	req.Header.Set("Content-Type", wr.FormDataContentType())
 
 	if res, err := http.DefaultClient.Do(req); err != nil {

@@ -5,12 +5,17 @@ import (
 	"path/filepath"
 )
 
-func Push(dir string, log chan<- string, user, pass string) error {
-	datal, err := List(user, pass)
+// Push will send all files from a directory to the client's account,
+// unless a newer version is found on the server
+//
+// If the second argument, log, is not nil, it will report which items are
+// being uploaded.
+func (c *Client) Push(dir string, log chan<- *Item) error {
+	datal, err := c.List()
 	if err != nil {
 		return err
 	}
-	data := make(map[string]Item)
+	data := make(map[string]*Item)
 	for _, d := range datal {
 		data[d.Path] = d
 	}
@@ -26,13 +31,15 @@ func Push(dir string, log chan<- string, user, pass string) error {
 		}
 
 		it, ok := data[rpath] // ok == false => new file
-		if !ok || it.Updated.Before(info.ModTime()) {
-			log <- rpath + ":" + path
+		if !ok || log == nil || it.Updated.Before(info.ModTime()) {
+			log <- it
 		}
 
 		return nil
 	})
 
-	close(log)
+	if log != nil {
+		close(log)
+	}
 	return nil
 }

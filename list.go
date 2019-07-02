@@ -8,14 +8,15 @@ import (
 	"time"
 )
 
-func List(user, pass string) (itms []Item, err error) {
-	req, err := http.NewRequest(http.MethodGet, list, nil)
+// List returns a list of all files/directories as items
+func (c *Client) List() (itms []*Item, err error) {
+	req, err := http.NewRequest(http.MethodGet, c.api+"/list", nil)
 	if err != nil {
 		return
 	}
 
-	req.SetBasicAuth(user, pass)
-	req.Header.Set("User-Agent", ua)
+	req.SetBasicAuth(c.user, c.pass)
+	req.Header.Set("User-Agent", userAgent)
 
 	res, err := http.DefaultClient.Do(req)
 	if res.StatusCode != 200 {
@@ -47,7 +48,7 @@ func List(user, pass string) (itms []Item, err error) {
 			size = 0
 		}
 
-		itms = append(itms, Item{
+		itms = append(itms, &Item{
 			Path:    i["path"].(string),
 			IsDir:   i["is_directory"].(bool),
 			Size:    uint(size),

@@ -9,15 +9,16 @@ import (
 	"strings"
 )
 
-func Delete(files []string, user, pass string) error {
+// Delete deletes the filepathes passed as arguments
+func (c *Client) Delete(files []string) error {
 	val := strings.NewReader(url.Values{"filenames[]": files}.Encode())
-	req, err := http.NewRequest(http.MethodPost, delete, val)
+	req, err := http.NewRequest(http.MethodPost, c.api+"/delete", val)
 	if err != nil {
 		return err
 	}
 
-	req.SetBasicAuth(user, pass)
-	req.Header.Set("User-Agent", ua)
+	req.SetBasicAuth(c.user, c.pass)
+	req.Header.Set("User-Agent", userAgent)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	res, err := http.DefaultClient.Do(req)
